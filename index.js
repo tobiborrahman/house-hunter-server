@@ -62,6 +62,9 @@ async function run() {
 
 		const userCollection = client.db('house-hunter').collection('users');
 		const houseCollection = client.db('house-hunter').collection('houses');
+		const commonHouseCollection = client
+			.db('house-hunter')
+			.collection('commonHouses');
 
 		// User Registration
 		app.post('/register', async (req, res) => {
@@ -206,7 +209,34 @@ async function run() {
 					description,
 				});
 
+				// For all the houses owners are added
+				const commonHouse = await commonHouseCollection.insertOne({
+					name,
+					address,
+					city,
+					bedrooms,
+					bathrooms,
+					roomSize,
+					picture,
+					availabilityDate,
+					rentPerMonth,
+					phoneNumber,
+					description,
+					owner: userId, // Associate the house with the owner
+				});
+
 				res.status(201).json({ message: 'House added successfully' });
+			} catch (error) {
+				console.error(error);
+				res.status(500).json({ error: 'Internal Server Error' });
+			}
+		});
+
+		app.get('/all-houses', async (req, res) => {
+			try {
+				// Fetch and return all houses from the common collection
+				const houses = await commonHouseCollection.find().toArray();
+				res.json({ houses });
 			} catch (error) {
 				console.error(error);
 				res.status(500).json({ error: 'Internal Server Error' });
