@@ -40,8 +40,6 @@ const authenticateJWT = (req, res, next) => {
 		return res.status(401).json({ error: 'Unauthorized' });
 	}
 
-	console.log('Received Token:', token);
-
 	// Verify the JWT
 	jwt.verify(token.replace('Bearer ', ''), secretKey, (err, decoded) => {
 		if (err) {
